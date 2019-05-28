@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  nginx:
+    image: nginx:stable-alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+      - ./webroot:/etc/nginx/webroot
+    ports:
+      - "80:80"
+      - "443:443"

@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  jenkins:
+    image: jenkinsci/blueocean:lts
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    ports:
+      - '50000:50000'
+      - '8080:8080'

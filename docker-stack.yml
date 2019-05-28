@@ -1,0 +1,34 @@
+version: '3.7'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./jenkins/jenkins_home:/var/jenkins_home
+    networks:
+      - halobear
+    ports:
+      - '50000:50000'
+      - '8080:8080'
+  nginx:
+    image: nginx:stable-alpine
+    depends_on:
+      - 'jenkins'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/webroot:/etc/nginx/webroot
+    networks:
+      - halobear
+    ports:
+      - '80:80'
+      - '443:443'
+networks:
+  halobear:
+    driver: overlay
