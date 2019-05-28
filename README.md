@@ -69,7 +69,82 @@ docker service logs halohear_jenkins --tail 1000
 - 构建后操作（选择钉钉通知、添加自定义群机器人【可先建群，然后踢人，变成个人机器人助手】）
 - 配置执行者数量(默认 2)：系统设置 -> 管理结点 -> -> 配置节点 -> 执行者数量
 
-## 五、 问题
+## 五、node 项目代码回滚
+
+- 参数化构建过程
+
+选项参数
+
+```bash
+# 名称
+Status
+# 选项
+Deploy
+RollBack
+# Deploy: 发布
+# ----------------
+# RollBack: 回滚
+```
+
+字符参数
+
+```
+# 名称
+Version
+
+```
+
+- 执行 shell
+
+```
+node -v
+echo "Status:$Status"
+
+path="${WORKSPACE}/bak"
+
+case $Status  in
+  Deploy)
+    if [ -d $path ];
+    then
+        echo "The files is already  exists "
+    else
+        mkdir -p $path
+    fi
+    cd ${WORKSPACE}
+    npm i
+    npm run build
+    cd dist
+    tar -zcvf ../bak/${JOB_NAME}-${BUILD_NUMBER}.tar.gz *
+    find $path  -mtime 10 -name "*.tar.gz"  -exec rm -rf {} \;
+    echo "Completin!"
+    ;;
+  RollBack)
+    echo "Version:$Version"
+    cd ${WORKSPACE}/bak
+    cp -R `ls $path | grep $Version`  ${JOB_NAME}-${BUILD_NUMBER}.tar.gz   ##复制为最新版本构建号
+    ;;
+  *)
+  exit
+      ;;
+esac
+
+```
+
+- SSH Publishers
+
+```bash
+# Source files
+bak/${JOB_NAME}-${BUILD_NUMBER}.tar.gz
+# Remove prefix
+bak/
+# Remote directory
+temp/
+# Exec command
+cd /***/temp/
+tar -zxvf ${JOB_NAME}-${BUILD_NUMBER}.tar.gz
+```
+
+## 六、 问题
 
 - jenkinsci/blueocean:lts 无法使用 nodeJS Plugins
   错误信息: `/tmp/jenkins642042413779803421.sh: line 4: node: not found`
