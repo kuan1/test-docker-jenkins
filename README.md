@@ -5,6 +5,7 @@
 - 选择 node 编译环境(Provide Node & npm bin/ folder to PATH)
 - 编译成功推送生产服务起(Provide Node & npm bin/ folder to PATH)
 - 钉钉通知状态
+- 编译代码回滚
 - 账号权限管理(Role-based Authorization Strategy)
 
 ## 一、安装 docker 环境
